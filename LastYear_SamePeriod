@@ -1,0 +1,8 @@
+Last Year Same Period = 
+CALCULATE(
+    SUM('dm'[submission_count]),
+    FILTER(
+        SAMEPERIODLASTYEAR('Date'[Date]),
+        'Date'[Date] <= DATE(YEAR(TODAY())-1, MONTH(TODAY()), DAY(TODAY()))
+    )
+)
