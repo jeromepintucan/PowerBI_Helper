@@ -1,0 +1,26 @@
+ActiveFilters =
+VAR MaxFilters = 4
+
+RETURN
+IF(
+  ISFILTERED('Date'[Date]),
+  VAR __f = FILTERS('Date'[Date])
+  VAR __minDate = MINX(__f, 'Date'[Date])
+  VAR __max_Date = MAXX(__f, 'Date'[Date])
+  VAR __x = "Date: (" & __minDate & " to " & __maxDate & ") "
+
+  RETURN
+  __x & UNICHAR(13) & UNICHAR(10),
+  "Date: (All Selected)" & UNICHAR(13) & UNICHAR(10)
+  )
+  &
+  IF(
+    ISFILTERED('Source'[Source]),
+    VAR __f = FILTERS('Source'[Source])
+    VAR __r = COUNTROWS(__f)
+    VAR __t = TOPN(MaxFilters, __f, 'Source'[Source])
+    VAR __d = CONCATENATEX(__t, 'Source'[Source], ", ")
+    VAR __x = "Source Selected: : & __d & IF(__r > MaxFilters, ", ... [" & __r & " items selected]") & " "
+
+  RETURN
+  __x & UNICHAR(13) & UNICHAR(10)
