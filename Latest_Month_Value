@@ -1,0 +1,24 @@
+#LatestMonth - Policies Billed =
+VAR SelectedMonthYear = 
+IF(
+  ISFILTERED('Date'[Month Year]),
+  BLANK()
+)
+
+VAR LatestTransactionDate =
+MAXX(
+  ALL('Consolidated Monthly'),
+  'Consolidated Monthly'[TRANSACTION DATE]
+)
+
+VAR EndOfLatestMonth = FORMAT(LatestTransactionDate, "MMM YYYY")
+
+
+RETURN
+CALCULATE(
+  'Consolidated Monthly'[Policies Billed - Monthly],
+  FILTER(
+    ALL('Date'),
+    'Date'[Month Year] = IF(ISBLANK(SelectedMonthYear), EndOfLatestMonth, FORMAT(SelectedMonthYear, "MMM YYYY"))
+  )
+)
