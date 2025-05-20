@@ -1,0 +1,8 @@
+%FundSwitch Percent to Total = 
+DIVIDE(
+    'FundSwitch'[Total Fund Switches],
+    CALCULATE(
+        'FundSwitch'[Total Fund Switches],
+        ALL('FundSwitch')
+    )
+)
