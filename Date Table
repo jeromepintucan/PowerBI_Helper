@@ -1,0 +1,37 @@
+
+Date = 
+ADDCOLUMNS(
+    CALENDAR(DATE(2024, 1, 1), EOMONTH(TODAY(), 0)),
+    "Year", YEAR([Date]),
+    "Quarter No", QUARTER([Date]),
+    "Quarter", "Q" & QUARTER([Date]),
+    "Month No", MONTH([Date]),
+    "Month", FORMAT([Date], "MMM"),
+    "Full Month", FORMAT([Date], "MMMM"),
+    "Day", DAY([Date]),
+    "Month Year", FORMAT([Date], "mmm yyyy"),
+    "To Present", IF([Date] <= TODAY(), 1, 0),
+    "Daily", [Date],
+    "Week", WEEKNUM([Date]),
+    "Weekly", "W" & WEEKNUM([Date]),
+    "Monthly", FORMAT([Date], "MMM"),
+    "Quarterly", "Q" & QUARTER([Date]),
+    "Yearly", YEAR([Date]),
+    "Month Year Sort", YEAR([Date]) * 100 + MONTH([Date]),
+    "Present Month", IF(YEAR([Date]) = YEAR(TODAY()) && MONTH([Date]) = MONTH(TODAY()), 1, 0),
+    // "Present Month", IF(MONTH([Date]) = MONTH(TODAY()), 1, 0),
+    "To Present Day", IF(YEAR([Date]) = YEAR(TODAY()) && MONTH([Date]) = MONTH(TODAY()) && DAY([Date]) <= DAY(TODAY()), 1, 0),
+    "Before Previous Day", IF([Date] < TODAY(), 1, 0),
+    "Month Day", FORMAT([Date], "MMM DD"),
+    "Month Day Sort", MONTH([Date]) * 100 + DAY([Date]),
+    "In Main Table",
+IF(
+    NOT(
+        ISBLANK(
+        LOOKUPVALUE('Consolidated Monthly'[TRANSACTION DATE], 'Consolidated Monthly'[TRANSACTION DATE], [Date])
+        )
+    ),
+    1,
+    0
+)
+)
