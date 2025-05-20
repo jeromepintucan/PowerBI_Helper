@@ -1,0 +1,19 @@
+Max Transaction Date = 
+VAR MaxDate = 
+// MAX('report_branch_district_filtered'[transaction_date])
+CALCULATE(
+  MAX('report_branch_district_filtered'[transaction_date]),
+  ALLSELECTED()
+)
+
+VAR cc = 
+    CALCULATE(
+        [CC],
+        FILTER(
+            'Date',
+            'Date'[Date] = MaxDate
+        )
+    )
+
+RETURN
+IF(ISBLANK(cc), 0, cc)
