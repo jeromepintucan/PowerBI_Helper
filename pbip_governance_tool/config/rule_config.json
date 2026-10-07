@@ -1,0 +1,54 @@
+{
+  "_comment": "Editable settings for the BI Dev Assistant. Restart the app after changing this file.",
+
+  "_note_on_focus_mode": "Focus mode is intentionally NOT in this list. Power BI Desktop has no dedicated JSON property for it - it's simply the enabled default, and PBI only ever writes properties that differ from default. So it's never written by this tool either; every icon listed below gets explicitly disabled instead, which leaves Focus mode as the only one still on.",
+
+  "icons": {
+    "visual_information": "showVisualInformationButton",
+    "visual_warning": "showVisualWarningButton",
+    "visual_error": "showVisualErrorButton",
+    "drill_role_selector": "showDrillRoleSelector",
+    "drill_up": "showDrillUpButton",
+    "drill_toggle": "showDrillToggleButton",
+    "drill_down_level": "showDrillDownLevelButton",
+    "drill_down_expand": "showDrillDownExpandButton",
+    "pin": "showPinButton",
+    "see_data": "showSeeDataLayoutToggleButton",
+    "options": "showOptionsMenu",
+    "filter": "showFilterRestatementButton",
+    "comment": "showCommentButton",
+    "copy_image": "showCopyVisualImageButton",
+    "set_alert": "showSetAlertButton"
+  },
+
+  "no_header_visual_types": [
+    "textbox", "image", "shape", "actionbutton", "basicshape", "wordcloud", "qnavisual"
+  ],
+
+  "_note_on_color_palette": "Source of truth: the 'Power BI Sequence' sheet in WTW_Data_Visualization_Color_Catalog.xlsx, in this exact order (order matters for the report theme's dataColors array). This checks VISUAL/data colors only - color_object_allowlist deliberately excludes text, label, axis, legend, title and gridline properties.",
+
+  "approved_palette": [
+    "#521380", "#24A19B", "#4A91F4", "#CA8100", "#E76F00",
+    "#E954D3", "#F75784", "#995BC5", "#1A71EF", "#C25700"
+  ],
+
+  "_note_on_color_object_allowlist": "Deliberately excludes 'fill' - on chart-type visuals it's not used, and on UI elements (buttons, shapes, page navigators) it's chrome/branding, not a data color, so including it just produced noise (e.g. flagging a deliberately-branded button color as a 'data color' violation).",
+
+  "color_object_allowlist": [
+    "dataPoint", "colors", "plotArea", "dataBars", "tree", "ribbonChart"
+  ],
+
+  "_note_on_export_compliant_values": "report.json's settings.exportDataMode value(s) that count as compliant (not a violation). 'None' (export fully disabled) is confirmed directly from real project data. 'AllowSummarized' (summarized-data-only export) is the best-evidenced name for the other state you said should also be acceptable, but Microsoft doesn't publish an authoritative enum list for this property - if your projects use a different exact string for 'summarized only', add it here. The auto-fix always sets exportDataMode to 'None' (the one unambiguous, always-safe value), regardless of which of these was missing.",
+
+  "export_compliant_values": ["None", "AllowSummarized"],
+
+  "_note_on_tcto_path_prefixes": "The approved TCTO SharePoint location every table's data source is expected to resolve to. Confirmed directly from the real DC & Benefit Affordability Dashboard's expressions.tmdl (its 'SourceFile' shared parameter). A source resolving to a path that doesn't start with one of these prefixes is flagged for review; add another entry here for a different project's own approved TCTO subfolder.",
+
+  "tcto_path_prefixes": [
+    "https://wtwonline.sharepoint.com/sites/tctPA_RETNADataI/Projects/"
+  ],
+
+  "_note_on_alignment_excluded_page_substrings": "Rule 10 (table/matrix alignment) is skipped entirely on any page whose display name contains one of these substrings (case-insensitive). Confirmed against a real page, 'Info (Plan design)', whose Matrix is a flat glossary list with no Values well at all - it has no 'Specific column' override in the Format pane to fix at all, only a 'Row headers > Alignment' control this tool doesn't yet know how to write safely. Add another entry here for a different project's own equivalent page-naming convention.",
+
+  "alignment_excluded_page_substrings": ["info"]
+}

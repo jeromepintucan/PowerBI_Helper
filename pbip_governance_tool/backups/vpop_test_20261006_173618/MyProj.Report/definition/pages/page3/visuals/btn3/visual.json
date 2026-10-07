@@ -1,0 +1,11 @@
+{
+  "name": "btn3",
+  "position": {"x":0,"y":0,"z":0,"height":10,"width":10},
+  "visual": {
+    "visualType": "actionButton",
+    "visualContainerObjects": {
+      
+      "title": [{"properties": {"text": {"expr": {"Literal": {"Value": "'Visualize population'"}}}}}]
+    }
+  }
+}

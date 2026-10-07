@@ -1,0 +1,35 @@
+table 'Metric change Avg and Total'
+	lineageTag: 988102d2-fe54-4ca9-bd85-f5269e449e0b
+
+	column Metric
+		lineageTag: 9b407a30-4845-4fbb-be09-1d8cc403f7c4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Metric]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		formatString: 0
+		lineageTag: b2a96a2a-8dc9-4212-8b29-6b863d4a4709
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Metric change Avg and Total' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Metric", STRING,
+				    "Sort", INTEGER,
+				    {
+				        {"Average", 1},
+				        {"Total", 2}
+				    }
+				)
+
+	annotation PBI_Id = d02a1b6a8944418691980fce7d9a56b9
+

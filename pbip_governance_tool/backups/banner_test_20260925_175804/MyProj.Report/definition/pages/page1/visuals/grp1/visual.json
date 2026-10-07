@@ -1,0 +1,6 @@
+{
+  "name": "grp1",
+  "position": {"x": 0, "y": 624, "z": 10000, "height": 96, "width": 1280, "tabOrder": 10000},
+  "visualGroup": {"displayName": "Disclaimer Banner", "groupMode": "ScaleMode"},
+  "isHidden": true
+}

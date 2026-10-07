@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>BI Dev Assistant</title>
+<style>
+  :root{
+    /* Light theme, accented with the approved WTW brand sequence. */
+    --bg:#F5F3F8; --panel:#FFFFFF; --panel-2:#FBF9FD; --border:#E2DCEA;
+    --text:#2F2C31; --text-dim:#726B7A; --accent:#521380; --accent-2:#4A91F4;
+    --good:#007D61; --warn:#8A5A00; --warn-bg:#FFF4E0; --warn-border:#F0C889; --bad:#B1232D;
+    --radius:14px;
+    font-family:-apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 10% -10%, #52138014, transparent),
+      radial-gradient(1000px 500px at 110% 10%, #4a91f41a, transparent),
+      var(--bg);
+    color:var(--text); min-height:100vh;
+  }
+  .app{max-width:1080px; margin:0 auto; padding:28px 24px 60px;}
+  header.top{display:flex; align-items:center; gap:14px; margin-bottom:28px;}
+  .logo{
+    width:42px; height:42px; border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex; align-items:center; justify-content:center; flex:none;
+    box-shadow:0 6px 20px -6px #52138055;
+  }
+  .logo svg{width:22px;height:22px;}
+  h1{font-size:19px; margin:0; letter-spacing:.2px;}
+  .sub{color:var(--text-dim); font-size:13px; margin-top:2px;}
+
+  .card{
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px; margin-bottom:20px;
+    box-shadow:0 1px 3px -1px #2f2c3114;
+  }
+  .row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .path-box{
+    flex:1; min-width:220px; background:#F7F5FA; border:1px dashed var(--border);
+    border-radius:10px; padding:11px 14px; font-size:13px; color:var(--text-dim);
+    overflow-wrap:anywhere;
+  }
+  .path-box.has-path{color:var(--text); border-style:solid;}
+  button{
+    font:inherit; cursor:pointer; border:none; border-radius:10px;
+    padding:11px 18px; font-size:13.5px; font-weight:600;
+    transition:transform .06s ease, filter .15s ease;
+  }
+  button:active{transform:scale(.97);}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white;}
+  .btn-primary:hover:not(:disabled){filter:brightness(1.08);}
+  .btn-ghost{background:#EDEAF3; color:var(--text);}
+  .btn-ghost:hover:not(:disabled){background:#E2DCEC;}
+  .btn-danger-outline{background:transparent; color:var(--bad); border:1px solid #EAC0C4;}
+
+  .steps{display:flex; gap:8px; margin-bottom:22px;}
+  .step{flex:1; height:4px; border-radius:4px; background:#E7E2ED;}
+  .step.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:6px;}
+  .stat{background:#F7F5FA; border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+  .stat .num{font-size:22px; font-weight:700;}
+  .stat .lbl{font-size:11.5px; color:var(--text-dim); margin-top:2px; text-transform:uppercase; letter-spacing:.5px;}
+
+  .warn-banner{
+    background:var(--warn-bg); border:1px solid var(--warn-border); color:var(--warn);
+    border-radius:10px; padding:12px 14px; font-size:13px; margin-top:14px;
+  }
+  .warn-banner div{margin-bottom:4px;}
+  .warn-banner div:last-child{margin-bottom:0;}
+
+  .rule-group{margin-top:18px;}
+  .rule-head{
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; padding:10px 4px;
+  }
+  .rule-title{display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px;}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .dot.slicer_header_disabled{background:var(--bad);}
+  .dot.visual_header_focus_only{background:#C9821A;}
+  .dot.sort_ascending{background:var(--accent-2);}
+  .dot.color_palette_compliance{background:var(--accent);}
+  .dot.export_disabled{background:#B1232D;}
+  .dot.filters_locked_hidden{background:#24A19B;}
+  .dot.legend_bold{background:#995BC5;}
+  .dot.data_source_review{background:#726B7A;}
+  .dot.data_point_border{background:#1A71EF;}
+  .dot.table_values_centered{background:#C25700;}
+  .dot.dc_benefit_headcount_measure_source{background:#4A91F4;}
+  .dot.dc_benefit_baseline_cardinality{background:#24A19B;}
+  .dot.dc_benefit_plan_design_no_privacy_note{background:#B1232D;}
+  .count-badge{
+    background:#EDEAF3; color:var(--text-dim); font-size:11.5px; padding:2px 9px;
+    border-radius:20px; margin-left:6px;
+  }
+  .chev{color:var(--text-dim); transition:transform .15s ease;}
+  .chev.open{transform:rotate(90deg);}
+
+  .finding-list{display:none; flex-direction:column; gap:8px; padding:4px 4px 4px 4px;}
+  .finding-list.open{display:flex;}
+  .finding{
+    display:flex; gap:12px; align-items:flex-start; background:#FAF8FC;
+    border:1px solid var(--border); border-radius:10px; padding:12px 14px;
+  }
+  .finding input[type=checkbox]{margin-top:3px; accent-color:var(--accent); width:16px; height:16px; flex:none;}
+  .finding .meta{font-size:12px; color:var(--text-dim); margin-bottom:3px;}
+  .finding .meta b{color:var(--text); font-weight:600;}
+  .finding .detail{font-size:12.5px; color:var(--text-dim); line-height:1.4;}
+  .tag{
+    display:inline-block; font-size:10.5px; background:#EFEAF7; border:1px solid var(--border);
+    color:var(--text-dim); border-radius:6px; padding:1px 6px; margin-left:6px;
+  }
+  .tag-family{
+    display:inline-block; font-size:10.5px; font-weight:600; border-radius:6px;
+    padding:1px 7px; margin-left:8px; border:1px solid; vertical-align:middle;
+  }
+
+  .select-row{display:flex; gap:10px; align-items:center; font-size:12.5px; color:var(--text-dim); margin-top:4px;}
+  .select-row a{color:var(--accent); cursor:pointer; text-decoration:none;}
+  .select-row a:hover{text-decoration:underline;}
+
+  .footer-bar{
+    position:sticky; bottom:0; margin-top:22px; padding:16px 20px;
+    background:linear-gradient(180deg,#f5f3f8cc,#f5f3f8); backdrop-filter:blur(6px);
+    border:1px solid var(--border); border-radius:14px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+  }
+  .empty{
+    text-align:center; padding:50px 20px; color:var(--text-dim);
+  }
+  .empty .big{font-size:34px; margin-bottom:6px;}
+  .toast{
+    position:fixed; right:24px; bottom:24px; background:var(--panel);
+    border:1px solid var(--border); border-left:4px solid var(--good);
+    padding:14px 18px; border-radius:10px; max-width:380px; font-size:13px;
+    box-shadow:0 12px 30px -8px #2f2c3140; animation:pop .18s ease;
+  }
+  .toast.err{border-left-color:var(--bad);}
+  @keyframes pop{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .spinner{
+    width:16px; height:16px; border-radius:50%; border:2px solid #ffffff55;
+    border-top-color:white; display:inline-block; animation:spin .7s linear infinite;
+    vertical-align:middle; margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .hint{font-size:12px; color:var(--text-dim); margin-top:10px; line-height:1.5;}
+  a.link{color:var(--accent); cursor:pointer;}
+
+  .page-search{
+    width:100%; margin-top:12px; background:#F7F5FA; border:1px solid var(--border);
+    border-radius:10px; padding:9px 12px; font-size:13px; color:var(--text); font:inherit;
+  }
+  .page-search:focus{outline:none; border-color:var(--accent);}
+  .pages-grid{display:flex; flex-wrap:wrap; gap:8px;}
+  .page-row{
+    display:flex; align-items:center; gap:8px; background:#F7F5FA; border:1px solid var(--border);
+    border-radius:10px; padding:8px 12px; font-size:12.5px; user-select:none;
+  }
+  .page-row:hover{border-color:#c9bcda;}
+  .page-row.active{border-color:var(--accent); background:#F1E7FA;}
+  .page-row input[type=checkbox]{accent-color:var(--accent); width:15px; height:15px; flex:none; cursor:pointer;}
+  .page-row .page-name{font-weight:600; cursor:pointer;}
+  .page-row .page-name:hover{color:var(--accent);}
+  .pages-actions{display:flex; gap:10px; align-items:center; font-size:12.5px; color:var(--text-dim); margin-top:12px;}
+  .pages-actions a{color:var(--accent); cursor:pointer; text-decoration:none;}
+  .pages-actions a:hover{text-decoration:underline;}
+
+  .filter-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:#F1E7FA; border:1px solid var(--accent); border-radius:12px;
+    padding:11px 16px; font-size:13px; margin-bottom:18px;
+  }
+  .filter-banner a{color:var(--accent); cursor:pointer; text-decoration:none; white-space:nowrap;}
+  .filter-banner a:hover{text-decoration:underline;}
+
+  .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:2px;}
+  .icon-chip{
+    display:inline-block; font-size:11px; background:#F3E8FB; border:1px solid #D9B8ED;
+    color:#6B2A8F; border-radius:20px; padding:3px 10px;
+  }
+  .swatch-chip{
+    display:inline-flex; align-items:center; gap:6px; font-size:11px; background:#F7F5FA;
+    border:1px solid var(--border); color:var(--text-dim); border-radius:20px; padding:3px 10px 3px 6px;
+    font-family:Consolas,Menlo,monospace;
+  }
+  .swatch-dot{width:13px; height:13px; border-radius:50%; flex:none; border:1px solid #00000022;}
+  .swatch-row{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:4px;}
+  .swatch-row .arrow{color:var(--text-dim); font-size:12px; margin:0 2px;}
+  .swatch-label{font-size:10.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.4px; margin-top:8px; margin-bottom:2px;}
+  .badge-manual{
+    display:inline-block; font-size:10.5px; color:var(--warn); border:1px solid var(--warn-border);
+    background:var(--warn-bg); border-radius:6px; padding:1px 7px; margin-left:6px; white-space:nowrap;
+  }
+  .opt-in-hint{font-size:11.5px; color:var(--text-dim); margin-top:6px; font-style:italic;}
+
+  .palette-legend{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px;}
+  .palette-legend .swatch-dot{width:20px; height:20px;}
+
+  .checklist{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .check-item{
+    display:flex; align-items:flex-start; gap:10px; background:#F7F5FA; border:1px solid var(--border);
+    border-radius:10px; padding:11px 14px; cursor:pointer; font-size:13px;
+  }
+  .check-item:hover{border-color:#c9bcda;}
+  .check-item input[type=checkbox]{accent-color:var(--accent); width:16px; height:16px; flex:none; margin-top:1px;}
+  .check-item .ci-title{font-weight:600;}
+  .check-item .ci-sub{color:var(--text-dim); font-size:12px; margin-top:2px;}
+
+  .family-select{
+    font:inherit; font-size:13px; color:var(--text); background:#F7F5FA;
+    border:1px solid var(--border); border-radius:10px; padding:9px 12px; cursor:pointer;
+  }
+  .family-select:focus{outline:none; border-color:var(--accent);}
+  .family-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .family-row label{font-size:13px; font-weight:600;}
+
+  /* ---- top-level tabs ---- */
+  .tabs{display:inline-flex; gap:4px; background:#EDEAF3; padding:4px; border-radius:12px; margin-bottom:22px;}
+  .tabs button{background:transparent; color:var(--text-dim); padding:9px 16px; font-size:13.5px; border-radius:9px;}
+  .tabs button.active{background:var(--panel); color:var(--accent); box-shadow:0 1px 3px -1px #2f2c3133;}
+  .tabs .run-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent-2); margin-left:7px; vertical-align:middle; animation:pulse 1s ease-in-out infinite alternate;}
+  @keyframes pulse{from{opacity:.35;} to{opacity:1;}}
+
+  /* ---- performance test view (scoped) ---- */
+  #perfView .p-label{font-size:13px; font-weight:600; margin-bottom:6px; display:block;}
+  #perfView .p-field{margin-bottom:16px;}
+  #perfView input[type=text], #perfView input[type=number]{
+    font:inherit; font-size:13px; color:var(--text); background:#F7F5FA; border:1px solid var(--border);
+    border-radius:10px; padding:10px 12px;}
+  #perfView input[type=text]{flex:1; min-width:260px;}
+  #perfView input[type=number]{width:80px;}
+  #perfView input:focus{outline:none; border-color:var(--accent);}
+  #perfView input.invalid{border-color:var(--bad);}
+  #perfView .p-err{color:var(--bad); font-size:12px; margin-top:6px;}
+  #perfView .btn-stop{background:transparent; color:var(--bad); border:1px solid #EAC0C4;}
+  #perfView .p-banner{border-radius:10px; padding:12px 14px; font-size:13px; margin-top:14px; line-height:1.45;}
+  #perfView .p-banner.warn{background:var(--warn-bg); border:1px solid var(--warn-border); color:var(--warn);}
+  #perfView .p-banner.info{background:#F1E7FA; border:1px solid #D9B8ED; color:#4b1773;}
+  #perfView .p-banner.bad{background:#FBEAEC; border:1px solid #EAC0C4; color:var(--bad);}
+  #perfView .p-progress{height:6px; border-radius:6px; background:#E7E2ED; overflow:hidden; margin-top:12px;}
+  #perfView .p-progress > div{height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .3s;}
+  #perfView .p-status{display:flex; align-items:center; gap:10px; font-size:13px; margin-top:4px;}
+  #perfView .p-spin{width:15px; height:15px; border-radius:50%; border:2px solid #52138033; border-top-color:var(--accent);
+    display:inline-block; animation:spin .7s linear infinite; flex:none;}
+  #perfView table{width:100%; border-collapse:collapse; font-size:13px;}
+  #perfView th{text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--text-dim);
+    padding:9px 10px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none; white-space:nowrap;}
+  #perfView th.num, #perfView td.num{text-align:right;}
+  #perfView th .arrow{opacity:.6; margin-left:3px;}
+  #perfView td{padding:9px 10px; border-bottom:1px solid #EEEAF3; vertical-align:top;}
+  #perfView tr:hover td{background:#FAF8FC;}
+  #perfView td.lead{font-weight:700; color:var(--accent);}
+  #perfView .muted{color:var(--text-dim);}
+  #perfView .st-ok{color:var(--good);}
+  #perfView .st-other{color:var(--warn);}
+  #perfView .p-note{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+  #perfView .p-results-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  #perfView .p-results-head h2{font-size:15px; margin:0;}
+  #perfView .p-empty{text-align:center; padding:30px 10px; color:var(--text-dim); font-size:13px;}
+  #perfView details summary{cursor:pointer; font-size:12.5px; color:var(--accent); font-weight:600;}
+  #perfView details ul{margin:8px 0 0 18px; padding:0; font-size:12.5px; color:var(--text-dim); line-height:1.55;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 19V10M12 19V5M20 19V13" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <h1>BI Dev Assistant</h1>
+      <div class="sub" id="appSub">Scan a Power BI Project folder for header, sort, color, export &amp; filter conventions, then auto-fix.</div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="active" id="tabScan" role="tab">Governance scan</button>
+    <button id="tabPerf" role="tab">Performance test<span class="run-dot" id="perfRunDot" hidden></span></button>
+  </div>
+
+<div id="scanView">
+
+  <div class="steps">
+    <div class="step" id="step1"></div>
+    <div class="step" id="step2"></div>
+    <div class="step" id="step3"></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="path-box" id="pathBox">Starting up…</div>
+      <button class="btn-ghost" id="browseBtn" disabled>Choose PBIP Folder…</button>
+    </div>
+    <div class="hint">Point this at the folder that contains your <code>.pbip</code> file (or a parent folder holding several PBIP projects). Nothing is changed until you click "Fix".</div>
+  </div>
+
+  <div class="card">
+    <div class="rule-title" style="margin-bottom:2px;">Checks to run</div>
+    <div class="hint" style="margin-top:2px;">Uncheck anything you don't want this scan to look at.</div>
+
+    <div class="family-row" style="margin-top:14px;">
+      <label for="familySelect">Dashboard family:</label>
+      <select id="familySelect" class="family-select"></select>
+    </div>
+    <div class="hint" id="familyHint" style="margin-top:6px;"></div>
+
+    <div class="checklist" id="ruleChecklist" style="margin-top:12px;"></div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn-primary" id="scanBtn" disabled>Scan</button>
+    </div>
+  </div>
+
+  <div id="resultsArea"></div>
+</div><!-- /scanView -->
+
+<div id="perfView" hidden>
+  <div class="card">
+    <div class="p-field">
+      <label class="p-label" for="perf-url">Published report link</label>
+      <div class="row"><input type="text" id="perf-url" placeholder="https://app.powerbi.com/groups/…/reports/…/…?experience=power-bi"/></div>
+      <div class="p-err" id="perf-urlErr" hidden></div>
+    </div>
+    <div class="p-field">
+      <label class="p-label">PBIP project folder <span class="muted" style="font-weight:400">(optional)</span></label>
+      <div class="row">
+        <div class="path-box" id="perf-pbipBox">Not set - pages are read from the report itself.</div>
+        <button class="btn-ghost" id="perf-browseBtn">Choose…</button>
+        <button class="btn-ghost" id="perf-clearBtn" hidden>Clear</button>
+      </div>
+      <div class="hint">Only used as a backup if the page list can't be read from the published report.</div>
+    </div>
+    <div class="p-field" style="margin-bottom:6px;">
+      <label class="p-label" for="perf-runs">Loads per page</label>
+      <div class="row"><input type="number" id="perf-runs" min="1" max="10" value="3"/>
+        <span class="hint" style="margin:0">The 1st load is shown on its own, plus the average of all loads - so caching can't hide a slow first open.</span></div>
+    </div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn-primary" id="perf-startBtn" disabled>Run performance test</button>
+      <button class="btn-stop" id="perf-stopBtn" hidden>Stop</button>
+    </div>
+    <div id="perf-envBanner"></div>
+    <details style="margin-top:14px;">
+      <summary>How it works</summary>
+      <ul>
+        <li>Opens Microsoft Edge with its own profile (your normal Edge is untouched). The first time, sign in to Power BI in that window - it stays signed in for later runs.</li>
+        <li>Opens the report once as a warm-up (not counted), then opens every page by its link, round-robin, for the number of loads you chose.</li>
+        <li>Reads the same network data as F12 &gt; Network: every visual <b>query</b> request (xhr), skipping preflight rows, until queries stop arriving for 5 seconds.</li>
+        <li><b>Page load</b> = the page's <b>slowest</b> visual query - the top "query" row when you sort the Network tab by Time. Queries run in parallel, so queries of 0.5 s, 1 s and 1.5 s mean the page loaded in 1.5 s. Power BI's own start-up time isn't included.</li>
+        <li>Each page is measured in its default state. Pop-ups or views behind bookmark buttons aren't clicked, and drillthrough pages open without a selection.</li>
+        <li>Results are saved automatically as a CSV in the <code>perf_results</code> folder next to this app.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="card" id="perf-statusCard" hidden>
+    <div class="p-status" id="perf-statusLine"></div>
+    <div class="p-progress"><div id="perf-bar"></div></div>
+    <div id="perf-statusBanner"></div>
+  </div>
+
+  <div class="card" id="perf-resultsCard" hidden>
+    <div class="p-results-head">
+      <div><h2>Results</h2><div class="hint" id="perf-sourceHint" style="margin-top:2px"></div></div>
+      <div class="row">
+        <button class="btn-ghost" id="perf-openBtn" hidden>Open results folder</button>
+        <button class="btn-ghost" id="perf-exportBtn" disabled>Export CSV…</button>
+      </div>
+    </div>
+    <div id="perf-tableWrap"></div>
+  </div>
+</div><!-- /perfView -->
+</div>
+
+<script>
+const RULE_ORDER = [
+  'slicer_header_disabled','visual_header_focus_only','sort_ascending','color_palette_compliance',
+  'export_disabled','filters_locked_hidden','legend_bold','data_source_review','data_point_border',
+  'table_values_centered','visualize_population_bookmark','visualize_population_orphaned','filter_values_sorted',
+  'employee_demographics_previous_page_back','segmentation_single_select',
+  'dc_benefit_headcount_measure_source','dc_benefit_baseline_cardinality','dc_benefit_plan_design_no_privacy_note',
+  'dc_benefit_disclaimer_banner_shown',
+];
+const RULE_LABEL = {
+  slicer_header_disabled: 'Slicer header icons must be disabled',
+  visual_header_focus_only: 'Header icons: only Focus mode enabled',
+  sort_ascending: 'Sort direction must be ascending',
+  color_palette_compliance: 'Visual colors must follow the approved brand palette',
+  export_disabled: 'Export must be disabled or restricted to summarized data',
+  filters_locked_hidden: 'Filters must be locked and hidden',
+  legend_bold: 'Visual legends must be bold',
+  data_source_review: 'Data source connections must be from the approved TCTO location',
+  data_point_border: 'Chart data points must have a white, 0.5pt border',
+  table_values_centered: 'Table/matrix values and column headers must be centered',
+  visualize_population_bookmark: "'Visualize population' button must bookmark to Employee demographics",
+  filter_values_sorted: 'Slicers must be sorted by their own field, ascending',
+  visualize_population_orphaned: "If 'Employee demographics' is not available, visualize population should be removed",
+  employee_demographics_previous_page_back: 'Employee demographics page must have a Previous page button with action type Back',
+  segmentation_single_select: 'Segmentation tabs are single select only',
+  dc_benefit_headcount_measure_source: 'MeasureTable[Headcount] must reference Employee_Segments, not Baseline',
+  dc_benefit_baseline_cardinality: 'Baseline ↔ Employee_Segments relationship must be 1:1',
+  dc_benefit_plan_design_no_privacy_note: 'Plan design page must not have the Data privacy note card',
+  dc_benefit_disclaimer_banner_shown: 'Disclaimer Banner must be shown by default on the selected pages',
+};
+
+// Candidate pages for the Disclaimer Banner rule's own page checkboxes -
+// matches the real DC & Benefit Affordability Dashboard's three pages that
+// have this component. Kept as a fixed list (rather than discovered from a
+// scan) since the checkboxes need to exist before the first scan runs.
+const DISCLAIMER_BANNER_CANDIDATE_PAGES = ['Benefit affordability', 'DC', 'Plan design'];
+// `family` is absent/undefined for generic rules (always shown, regardless
+// of the dropdown). Rules with a `family` only show up in the checklist
+// when that family is the current dropdown selection - and are additive on
+// top of the generic ones, never a replacement for them.
+const RULE_CHECKLIST = [
+  { id: 'slicer_header_disabled', title: 'Slicers', sub: 'Header icons must be disabled' },
+  { id: 'visual_header_focus_only', title: 'Header icons', sub: 'Only Focus mode enabled for all other visuals' },
+  { id: 'sort_ascending', title: 'Sorting', sub: 'Direction must be ascending' },
+  { id: 'color_palette_compliance', title: 'Color palette', sub: 'Visual colors must follow the approved WTW brand palette' },
+  { id: 'export_disabled', title: 'Export functionality has been disabled', sub: 'Report export must be off, or limited to summarized data' },
+  { id: 'filters_locked_hidden', title: 'Filters that are actively used in the filter pane should be locked and hidden', sub: 'Every filter card must be locked and hidden from viewers, active or not' },
+  { id: 'legend_bold', title: 'Legend should be bold', sub: 'Visual legends must be bold' },
+  { id: 'data_source_review', title: 'Data source is connecting directly to TCTO', sub: 'Flags any connection that isn’t from the approved TCTO SharePoint location - never auto-fixed' },
+  { id: 'data_point_border', title: 'Add white border with a 0.5 width on all chart', sub: 'Pie/donut/bar/column charts must show a white, 0.5pt border (Slices/Columns/Bars > Border)' },
+  { id: 'table_values_centered', title: 'Table alignment', sub: 'Table and matrix values, and column headers, must be centered' },
+  { id: 'visualize_population_bookmark', title: 'Make sure visualize population button points to Employee demographics', sub: 'Every "Visualize population" button, on every page, must bookmark to Employee demographics' },
+  { id: 'visualize_population_orphaned', title: "If 'Employee demographics' is not available, visualize population should be removed", sub: 'When the report has no Employee demographics page, every "Visualize population" button is flagged - fix deletes the button' },
+  { id: 'filter_values_sorted', title: 'Filter values are sorted properly, like by ascending based on their proper sort order', sub: 'Every slicer\'s \u2026 > Sort by must be its own field, Sort ascending - flagged for your review, fixed only if you tick it' },
+  { id: 'employee_demographics_previous_page_back', title: 'Employee demographics page has a Previous page button (action type: Back)', sub: 'The "Previous page" button on the Employee demographics page must use the Back action' },
+  { id: 'segmentation_single_select', title: 'Segmentation tabs are single select only', sub: 'Every "Segmentations Slicer" must have Single select turned on' },
+  { id: 'dc_benefit_headcount_measure_source', title: 'Headcount measure source', sub: 'MeasureTable[Headcount] must reference Employee_Segments, not Baseline - review only, never auto-fixed', family: 'dc_benefit' },
+  { id: 'dc_benefit_baseline_cardinality', title: 'Baseline relationship cardinality', sub: 'Baseline ↔ Employee_Segments must be declared 1:1 and active - review only, never auto-fixed', family: 'dc_benefit' },
+  { id: 'dc_benefit_plan_design_no_privacy_note', title: 'Plan design: no privacy note', sub: 'The "Data privacy note" card must not appear on the Plan design page - fix deletes the visual', family: 'dc_benefit' },
+  { id: 'dc_benefit_disclaimer_banner_shown', title: 'Disclaimer Banner shown by default', sub: 'The Disclaimer Banner group (not its individual pieces) must not be hidden by default on the pages checked below', family: 'dc_benefit', pageOptions: true },
+];
+
+// "all" = every generic rule, no family-specific ones. Add more entries
+// here (with a matching `family` value on the relevant RULE_CHECKLIST
+// items) as more dashboard-specific rule sets come in.
+const DASHBOARD_FAMILIES = [
+  { id: 'all', label: 'All (generic rules only)' },
+  { id: 'dc_benefit', label: 'DC & Benefit Affordability Dashboard' },
+];
+
+const state = {
+  folder: null, scan: null, selected: new Set(), busy: false, activePageFilter: null, pageSearch: '',
+  dashboardFamily: 'all',
+  // Only the generic (family-less) rules start enabled - family-specific
+  // ones only get added to this set once that family is actually selected
+  // (see familySelect's change handler below), so switching the dropdown
+  // back to "All" can't leave a hidden family rule silently still enabled.
+  enabledRules: new Set(RULE_CHECKLIST.filter(r => !r.family).map(r => r.id)),
+  approvedPalette: [],
+  // Which pages the Disclaimer Banner rule should check - all candidates
+  // start checked; unchecking a page here just excludes it from that one
+  // rule's scan, same as the rule's own on/off checkbox does for the whole
+  // rule.
+  disclaimerBannerPages: new Set(DISCLAIMER_BANNER_CANDIDATE_PAGES),
+};
+
+function setStep(n){
+  for(let i=1;i<=3;i++) document.getElementById('step'+i).classList.toggle('active', i<=n);
+}
+setStep(1);
+
+const pathBox = document.getElementById('pathBox');
+const browseBtn = document.getElementById('browseBtn');
+const scanBtn = document.getElementById('scanBtn');
+const resultsArea = document.getElementById('resultsArea');
+
+function showToast(msg, isErr){
+  const t = document.createElement('div');
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 5200);
+}
+
+function visibleRuleChecklist(){
+  return RULE_CHECKLIST.filter(r => !r.family || r.family === state.dashboardFamily);
+}
+
+function renderFamilySelect(){
+  const sel = document.getElementById('familySelect');
+  sel.innerHTML = DASHBOARD_FAMILIES.map(f =>
+    `<option value="${f.id}" ${f.id === state.dashboardFamily ? 'selected' : ''}>${escapeHtml(f.label)}</option>`
+  ).join('');
+  document.getElementById('familyHint').textContent = state.dashboardFamily === 'all'
+    ? 'Generic rules apply to every PBIP project. Pick a specific family to also include rules unique to that dashboard.'
+    : 'Family-specific rules below are added on top of the generic ones - nothing generic is skipped.';
+}
+
+function onFamilyChange(newFamily){
+  state.dashboardFamily = newFamily;
+  // Drop any rule id that's no longer visible under the new selection, and
+  // pre-check newly-visible family-specific rules by default - additive,
+  // generic rules are never touched by a family change either way.
+  const visibleIds = new Set(visibleRuleChecklist().map(r => r.id));
+  Array.from(state.enabledRules).forEach(id => { if(!visibleIds.has(id)) state.enabledRules.delete(id); });
+  RULE_CHECKLIST.filter(r => r.family === newFamily).forEach(r => state.enabledRules.add(r.id));
+  renderFamilySelect();
+  renderChecklist();
+  scanBtn.disabled = !state.folder || state.enabledRules.size === 0;
+}
+
+function renderChecklist(){
+  const box = document.getElementById('ruleChecklist');
+  box.innerHTML = visibleRuleChecklist().map(r => {
+    const legend = (r.id === 'color_palette_compliance' && state.approvedPalette.length)
+      ? `<div class="palette-legend">${state.approvedPalette.map(h => swatch(h)).join('')}</div>`
+      : '';
+    // Rules flagged pageOptions:true (currently just the Disclaimer Banner
+    // rule) get their own small page-picker underneath - which pages that
+    // one rule checks, independent of the Pages panel elsewhere in the app
+    // (that filters which *findings* show up after a scan; this decides
+    // what the rule even looks at during the scan).
+    const pagePicker = r.pageOptions ? `
+        <div class="page-options" style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;">
+          ${DISCLAIMER_BANNER_CANDIDATE_PAGES.map(p => `
+            <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;">
+              <input type="checkbox" data-banner-page="${escapeHtml(p)}" ${state.disclaimerBannerPages.has(p) ? 'checked' : ''}/>
+              ${escapeHtml(p)}
+            </label>`).join('')}
+        </div>` : '';
+    return `
+    <label class="check-item">
+      <input type="checkbox" data-rule="${r.id}" ${state.enabledRules.has(r.id) ? 'checked' : ''}/>
+      <div>
+        <div class="ci-title">${escapeHtml(r.title)}${r.family ? familyBadge(r.family) : ''}</div>
+        <div class="ci-sub">${escapeHtml(r.sub)}</div>
+        ${legend}
+        ${pagePicker}
+      </div>
+    </label>`;
+  }).join('');
+  box.querySelectorAll('input[type=checkbox][data-rule]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if(cb.checked) state.enabledRules.add(cb.dataset.rule);
+      else state.enabledRules.delete(cb.dataset.rule);
+      scanBtn.disabled = !state.folder || state.enabledRules.size === 0;
+    });
+  });
+  box.querySelectorAll('input[type=checkbox][data-banner-page]').forEach(cb=>{
+    cb.addEventListener('click', (e) => e.stopPropagation());
+    cb.addEventListener('change', (e)=>{
+      e.stopPropagation();
+      const page = cb.dataset.bannerPage;
+      if(cb.checked) state.disclaimerBannerPages.add(page);
+      else state.disclaimerBannerPages.delete(page);
+    });
+  });
+}
+renderFamilySelect();
+renderChecklist();
+document.getElementById('familySelect').addEventListener('change', (e) => onFamilyChange(e.target.value));
+
+window.addEventListener('pywebviewready', async () => {
+  browseBtn.disabled = false;
+  pathBox.textContent = 'No folder selected yet.';
+  try{
+    const settings = await window.pywebview.api.get_settings();
+    state.approvedPalette = settings.approved_palette || [];
+    renderChecklist();
+  }catch(e){ /* non-critical - checklist still works without the swatch preview */ }
+});
+
+browseBtn.addEventListener('click', async () => {
+  const path = await window.pywebview.api.browse_folder();
+  if(path){
+    state.folder = path;
+    pathBox.textContent = path;
+    pathBox.classList.add('has-path');
+    scanBtn.disabled = state.enabledRules.size === 0;
+    setStep(1);
+  }
+});
+
+scanBtn.addEventListener('click', () => runScan());
+
+// "Auto-fixable" = swept in by "Fix Selected" / "select all" by default.
+// A finding can be fixable (checkbox enabled, can be fixed if the user asks)
+// without being auto-selected - e.g. a hardcoded color snapped to its
+// nearest palette match needs a human glance first, so it starts unchecked.
+function isAutoFixable(f){
+  return f.fixable && f.auto_select !== false;
+}
+
+async function runScan(){
+  if(!state.folder || state.busy || state.enabledRules.size === 0) return;
+  state.busy = true;
+  scanBtn.disabled = true;
+  scanBtn.innerHTML = '<span class="spinner"></span>Scanning…';
+  resultsArea.innerHTML = '';
+  try{
+    const ruleOptions = { disclaimer_banner_pages: Array.from(state.disclaimerBannerPages) };
+    const data = await withTimeout(
+      window.pywebview.api.scan(state.folder, Array.from(state.enabledRules), ruleOptions),
+      10 * 60 * 1000, 'Scan'
+    );
+    state.scan = data;
+    state.selected = new Set(data.findings.filter(isAutoFixable).map(f=>f.id));
+    setStep(2);
+    render();
+  }catch(e){
+    showToast('Scan failed: ' + e, true);
+  }finally{
+    state.busy = false;
+    scanBtn.disabled = false;
+    scanBtn.textContent = 'Scan';
+  }
+}
+
+function render(){
+  const d = state.scan;
+  if(!d) { resultsArea.innerHTML=''; return; }
+
+  let html = '';
+  html += `<div class="card">
+    <div class="stat-grid">
+      <div class="stat"><div class="num">${d.reports_scanned.length}</div><div class="lbl">Reports</div></div>
+      <div class="stat"><div class="num">${d.pages_scanned}</div><div class="lbl">Pages</div></div>
+      <div class="stat"><div class="num">${d.visuals_scanned}</div><div class="lbl">Visuals</div></div>
+      <div class="stat"><div class="num">${d.total_findings}</div><div class="lbl">Findings</div></div>
+    </div>`;
+
+  if(d.warnings && d.warnings.length){
+    html += `<div class="warn-banner">${d.warnings.map(w=>`<div>⚠ ${escapeHtml(w)}</div>`).join('')}</div>`;
+  }
+  html += `</div>`;
+
+  if(d.total_findings === 0){
+    html += `<div class="card empty">
+      <div class="big">✅</div>
+      <div><b>No violations found.</b> Every visual already matches the header-icon and sort rules.</div>
+    </div>`;
+    resultsArea.innerHTML = html;
+    setStep(3);
+    return;
+  }
+
+  const pagesSummary = computePagesSummary(d);
+  html += renderPagesPanel(pagesSummary);
+
+  if(state.activePageFilter){
+    const p = pagesSummary.find(x => x.key === state.activePageFilter);
+    const label = p ? p.page : state.activePageFilter.split('::')[1];
+    html += `<div class="filter-banner">
+      Showing findings for <b>${escapeHtml(label)}</b> only
+      <a onclick="clearPageFilter()">clear filter - show all pages</a>
+    </div>`;
+  }
+
+  RULE_ORDER.forEach(ruleId => {
+    let items = d.findings_by_rule[ruleId] || [];
+    if(state.activePageFilter){
+      items = items.filter(f => (f.report_name + '::' + f.page_name) === state.activePageFilter);
+    }
+    if(items.length === 0) return;
+    html += renderRuleGroup(ruleId, items);
+  });
+
+  html += `<div class="footer-bar">
+    <div class="select-row" style="margin:0;">
+      <span id="selCount">${state.selected.size} selected</span>
+      <a onclick="selectAll(true)">select all</a>
+      <a onclick="selectAll(false)">select none</a>
+    </div>
+    <button class="btn-primary" id="fixBtn">Fix Selected</button>
+  </div>`;
+
+  resultsArea.innerHTML = html;
+  setStep(3);
+
+  document.getElementById('fixBtn').addEventListener('click', applyFixes);
+  document.querySelectorAll('.rule-head').forEach(h=>{
+    h.addEventListener('click', ()=>{
+      const list = h.nextElementSibling;
+      list.classList.toggle('open');
+      h.querySelector('.chev').classList.toggle('open');
+    });
+  });
+  document.querySelectorAll('.finding input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if(cb.checked) state.selected.add(cb.dataset.id);
+      else state.selected.delete(cb.dataset.id);
+      document.getElementById('selCount').textContent = state.selected.size + ' selected';
+    });
+  });
+
+  const pageByKey = new Map(pagesSummary.map(p => [p.key, p]));
+  document.querySelectorAll('.page-checkbox').forEach(cb=>{
+    const p = pageByKey.get(cb.dataset.key);
+    if(!p) return;
+    const allSelected = p.fixableIds.length > 0 && p.fixableIds.every(id => state.selected.has(id));
+    const noneSelected = p.fixableIds.every(id => !state.selected.has(id));
+    cb.indeterminate = !allSelected && !noneSelected;
+    cb.addEventListener('change', ()=>{
+      if(cb.checked) p.fixableIds.forEach(id => state.selected.add(id));
+      else p.fixableIds.forEach(id => state.selected.delete(id));
+      render();
+      document.querySelectorAll('.finding-list').forEach(el=>el.classList.add('open'));
+      document.querySelectorAll('.chev').forEach(el=>el.classList.add('open'));
+    });
+  });
+
+  document.querySelectorAll('.page-name').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.dataset.key;
+      state.activePageFilter = (state.activePageFilter === key) ? null : key;
+      render();
+      document.querySelectorAll('.finding-list').forEach(el=>el.classList.add('open'));
+      document.querySelectorAll('.chev').forEach(el=>el.classList.add('open'));
+    });
+  });
+
+  const searchBox = document.getElementById('pageSearch');
+  if(searchBox){
+    searchBox.addEventListener('input', ()=>{
+      state.pageSearch = searchBox.value;
+      applyPageSearch();
+    });
+    applyPageSearch();
+  }
+}
+
+// Stable badge color per dashboard family name - cycles through the same
+// approved WTW brand palette already used for rule dots elsewhere in this
+// UI, so as more dashboard families get added over time each one keeps a
+// distinct, consistent color in the checklist.
+function badgeColor(text){
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) { hash = (hash * 31 + text.charCodeAt(i)) >>> 0; }
+  const palette = ['#521380','#24A19B','#4A91F4','#CA8100','#E76F00','#E954D3','#F75784','#995BC5','#1A71EF','#C25700'];
+  return palette[hash % palette.length];
+}
+function familyBadge(familyId){
+  const fam = DASHBOARD_FAMILIES.find(f => f.id === familyId);
+  const label = fam ? fam.label : familyId;
+  const c = badgeColor(label);
+  return `<span class="tag-family" style="background:${c}1a; color:${c}; border-color:${c}66;">${escapeHtml(label)}</span>`;
+}
+
+function computePagesSummary(d){
+  const map = new Map();
+  d.findings.forEach(f=>{
+    const key = f.report_name + '::' + f.page_name;
+    if(!map.has(key)){
+      map.set(key, { key, report: f.report_name, page: f.page_name, ids: [], fixableIds: [] });
+    }
+    const entry = map.get(key);
+    entry.ids.push(f.id);
+    if(isAutoFixable(f)) entry.fixableIds.push(f.id);
+  });
+  return Array.from(map.values()).sort((a, b) => (a.report + a.page).localeCompare(b.report + b.page));
+}
+
+function renderPagesPanel(pages){
+  const rows = pages.map(p => {
+    const allSelected = p.fixableIds.length > 0 && p.fixableIds.every(id => state.selected.has(id));
+    const active = state.activePageFilter === p.key;
+    return `<div class="page-row${active ? ' active' : ''}" data-search="${escapeHtml(p.page.toLowerCase())}">
+      <input type="checkbox" class="page-checkbox" data-key="${escapeHtml(p.key)}" ${allSelected ? 'checked' : ''} />
+      <span class="page-name" data-key="${escapeHtml(p.key)}" title="Click to show only this page's findings below">${escapeHtml(p.page)}</span>
+      <span class="tag">${escapeHtml(p.report)}</span>
+      <span class="count-badge">${p.ids.length}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="card">
+    <div class="rule-title" style="margin-bottom:4px;">Pages<span class="count-badge">${pages.length}</span></div>
+    <div class="hint" style="margin-top:0;">Uncheck a page to leave its findings out of "Fix Selected" below. Click a page name to jump straight to its findings.</div>
+    <input type="text" id="pageSearch" class="page-search" placeholder="Search pages…" value="${escapeHtml(state.pageSearch)}" />
+    <div class="pages-grid" id="pagesGrid" style="margin-top:10px;">${rows}</div>
+    <div class="pages-actions">
+      <a onclick="setAllPages(true)">select all pages</a>
+      <a onclick="setAllPages(false)">select no pages</a>
+    </div>
+  </div>`;
+}
+
+function clearPageFilter(){
+  state.activePageFilter = null;
+  render();
+}
+
+function applyPageSearch(){
+  const term = state.pageSearch.trim().toLowerCase();
+  document.querySelectorAll('#pagesGrid .page-row').forEach(row => {
+    const match = !term || row.dataset.search.includes(term);
+    row.style.display = match ? '' : 'none';
+  });
+}
+
+function setAllPages(on){
+  const d = state.scan;
+  if(!d) return;
+  if(on) state.selected = new Set(d.findings.filter(isAutoFixable).map(f=>f.id));
+  else state.selected = new Set();
+  render();
+  document.querySelectorAll('.finding-list').forEach(el=>el.classList.add('open'));
+  document.querySelectorAll('.chev').forEach(el=>el.classList.add('open'));
+}
+
+function isHexColor(s){
+  return typeof s === 'string' && /^#[0-9a-fA-F]{6}$/.test(s);
+}
+
+function swatch(hex){
+  return `<span class="swatch-chip"><span class="swatch-dot" style="background:${escapeHtml(hex)};"></span>${escapeHtml(hex)}</span>`;
+}
+
+function renderFindingBody(f){
+  const isColorRule = f.rule_id === 'color_palette_compliance';
+  const isSequenceCheck = isColorRule && f.visual_id === 'dataColors';
+  if(isSequenceCheck){
+    // "Current vs expected" style, for the theme dataColors sequence check -
+    // the whole 10-color array, order matters.
+    return `
+      <div class="detail" style="margin-bottom:2px;">${escapeHtml(f.detail)}</div>
+      <div class="swatch-label">Current</div>
+      <div class="swatch-row">${(f.items||[]).map(swatch).join('')}</div>
+      <div class="swatch-label">Expected (WTW brand sequence)</div>
+      <div class="swatch-row">${(f.expected||[]).map(swatch).join('')}</div>`;
+  }
+  if(isColorRule && f.items && f.items.length && f.items.every(isHexColor)){
+    // Per-visual / per-style hardcoded colors - show each one paired with
+    // the nearest approved match it would snap to if checked in.
+    const hasNearest = f.expected && f.expected.length === f.items.length;
+    const pairs = f.items.map((hex, i) => hasNearest
+      ? `<span class="swatch-row" style="margin-top:0; display:inline-flex;">${swatch(hex)}<span class="arrow">→</span>${swatch(f.expected[i])}</span>`
+      : swatch(hex)
+    ).join('');
+    return `
+      <div class="detail" style="margin-bottom:2px;">${escapeHtml(f.detail)}</div>
+      <div class="swatch-row">${pairs}</div>
+      ${f.auto_select === false ? `<div class="opt-in-hint">Check the box to snap these to their nearest approved match shown above.</div>` : ''}`;
+  }
+  if(f.items && f.items.length){
+    return `<div class="chip-row">${f.items.map(t => `<span class="icon-chip">${escapeHtml(t)}</span>`).join('')}</div>`;
+  }
+  return `<div class="detail">${escapeHtml(f.detail)}</div>`;
+}
+
+function renderRuleGroup(ruleId, items){
+  const drilled = !!state.activePageFilter;
+  const legend = (ruleId === 'color_palette_compliance' && state.approvedPalette.length)
+    ? `<div class="palette-legend" style="margin:0 0 8px;">${state.approvedPalette.map(h => swatch(h)).join('')}</div>
+       <div class="hint" style="margin-top:0; margin-bottom:14px;">Most visuals don't set their own colors - they cycle through the report theme's sequence automatically. Those are covered by the "Report Theme" finding above (fixing it recolors all of them at once) and aren't listed individually here. Only visuals with a <b>hardcoded</b> color override - one that won't change when the theme does - show up below.</div>`
+    : '';
+  const rows = items.map(f => {
+    const where = drilled
+      ? escapeHtml(f.visual_title || f.visual_type)
+      : `${escapeHtml(f.page_name)} → ${escapeHtml(f.visual_title || f.visual_type)}`;
+    const checkbox = f.fixable
+      ? `<input type="checkbox" data-id="${f.id}" ${state.selected.has(f.id)?'checked':''}/>`
+      : `<input type="checkbox" disabled title="Detected only - not automatically fixable, review manually"/>`;
+    return `
+    <div class="finding">
+      ${checkbox}
+      <div>
+        <div class="meta">${drilled ? '' : `<b>${escapeHtml(f.report_name)}</b> → `}${where}
+          <span class="tag">${escapeHtml(f.visual_type)}</span>
+          ${f.auto_select === false ? '<span class="badge-manual">Not auto-selected</span>' : ''}
+        </div>
+        ${renderFindingBody(f)}
+      </div>
+    </div>`;
+  }).join('');
+
+  const anyFixable = items.some(f => f.fixable);
+  const selectLinks = anyFixable
+    ? `<div class="select-row" style="margin:0 0 10px;">
+        <a onclick="event.stopPropagation(); selectAllInRule('${ruleId}', true)">select all in this rule</a>
+        <a onclick="event.stopPropagation(); selectAllInRule('${ruleId}', false)">select none in this rule</a>
+      </div>`
+    : '';
+
+  return `<div class="card rule-group">
+    <div class="rule-head">
+      <div class="rule-title"><span class="dot ${ruleId}"></span>${RULE_LABEL[ruleId]}<span class="count-badge">${items.length}</span></div>
+      <span class="chev">▶</span>
+    </div>
+    <div class="finding-list">${legend}${selectLinks}${rows}</div>
+  </div>`;
+}
+
+// Selects/deselects every fixable finding in one rule group, respecting the
+// current page-drilldown filter (if any) so it only touches what's actually
+// visible. This is a deliberate, explicit action - unlike the top-level
+// "select all" - so it includes findings that aren't auto_select by default
+// (e.g. a manual-review color match): the user picked exactly this rule on
+// purpose, which is itself the "eyeball it first" step.
+function selectAllInRule(ruleId, on){
+  const d = state.scan;
+  if(!d) return;
+  let items = d.findings_by_rule[ruleId] || [];
+  if(state.activePageFilter){
+    items = items.filter(f => (f.report_name + '::' + f.page_name) === state.activePageFilter);
+  }
+  items.forEach(f=>{
+    if(!f.fixable) return;
+    if(on) state.selected.add(f.id);
+    else state.selected.delete(f.id);
+  });
+  render();
+  document.querySelectorAll('.finding-list').forEach(el=>el.classList.add('open'));
+  document.querySelectorAll('.chev').forEach(el=>el.classList.add('open'));
+}
+
+function selectAll(on){
+  const d = state.scan;
+  if(!d) return;
+  if(on) state.selected = new Set(d.findings.filter(isAutoFixable).map(f=>f.id));
+  else state.selected = new Set();
+  render();
+  // re-open all groups after re-render so user still sees context
+  document.querySelectorAll('.finding-list').forEach(el=>el.classList.add('open'));
+  document.querySelectorAll('.chev').forEach(el=>el.classList.add('open'));
+}
+
+function withTimeout(promise, ms, label){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms/1000)}s`)), ms)),
+  ]);
+}
+
+async function applyFixes(){
+  if(state.selected.size === 0 || state.busy) return;
+  state.busy = true;
+  const btn = document.getElementById('fixBtn');
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Applying…'; }
+
+  try{
+    // Generous timeout: large projects on a syncing OneDrive folder can be slow,
+    // but this guarantees the UI can never get stuck forever.
+    const res = await withTimeout(
+      window.pywebview.api.apply_fixes(state.folder, Array.from(state.selected)),
+      10 * 60 * 1000,
+      'Fix'
+    );
+    if(res.failed_count > 0){
+      showToast(`Fixed ${res.applied_count}, but ${res.failed_count} failed. Backup: ${res.backup_folder}`, true);
+    } else {
+      showToast(`Fixed ${res.applied_count} item(s). Backup saved to: ${res.backup_folder}`);
+    }
+  }catch(e){
+    showToast('Fix failed: ' + e, true);
+    if(btn){ btn.disabled = false; btn.textContent = 'Fix Selected'; }
+  }finally{
+    // IMPORTANT: release the lock *before* triggering the rescan below -
+    // runScan() checks this same flag and would otherwise no-op silently,
+    // leaving the button stuck on "Applying..." even though work is done.
+    state.busy = false;
+  }
+
+  await runScan();
+}
+
+function escapeHtml(s){
+  if(s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+<script>
+/* ===================== Performance test tab =====================
+   Self-contained: own state, own helpers, perf_* API calls, ids prefixed "perf-". */
+(function(){
+const state = { pbip: null, polling: null, last: null, sort: { key: 'order', dir: 1 }, runs: 3 };
+const $ = id => document.getElementById('perf-' + id);
+
+function escapeHtml(s){
+  if(s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const fmt = v => (v === null || v === undefined) ? '<span class="muted">–</span>' : Number(v).toFixed(2);
+
+const COLS = [
+  { key: 'order', label: '#', num: true },
+  { key: 'name', label: 'Page' },
+  { key: 'avg_load_s', label: 'Page load (avg)', num: true, lead: true },
+  { key: 'first_load_s', label: 'Page load (1st run)', num: true },
+  { key: 'queries', label: 'Queries', num: true },
+  { key: 'status', label: 'Status' },
+];
+
+function renderTable(rows){
+  if(!rows || !rows.length){ $('tableWrap').innerHTML = '<div class="p-empty">Pages will appear here once the warm-up finishes.</div>'; return; }
+  const { key, dir } = state.sort;
+  const sorted = [...rows].sort((a, b) => {
+    const x = a[key], y = b[key];
+    if(x === y) return a.order - b.order;
+    if(x === null || x === undefined) return 1;
+    if(y === null || y === undefined) return -1;
+    return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir;
+  });
+  const head = COLS.map(c => `<th class="${c.num ? 'num' : ''}" data-key="${c.key}">${c.label}${c.key === key ? `<span class="arrow">${dir > 0 ? '▲' : '▼'}</span>` : ''}</th>`).join('');
+  const body = sorted.map(r => {
+    const statusCls = r.status === 'ok' ? 'st-ok' : 'st-other';
+    const statusTxt = r.runs_done < state.runs && r.status !== 'pending'
+      ? `${escapeHtml(r.status)} <span class="muted">(${r.runs_done}/${state.runs})</span>` : escapeHtml(r.status);
+    const loads = (r.loads_s || []).map(v => v === null ? '–' : Number(v).toFixed(2)).join(' · ');
+    return `<tr>
+      <td class="num muted">${r.order}</td>
+      <td><b>${escapeHtml(r.name)}</b>${r.hidden ? '<span class="tag">hidden</span>' : ''}
+          <div class="p-note">${escapeHtml(r.page_id)}${loads ? ` · loads: ${loads}s` : ''}</div></td>
+      <td class="num lead">${fmt(r.avg_load_s)}</td>
+      <td class="num">${fmt(r.first_load_s)}</td>
+      <td class="num">${r.queries ?? '<span class="muted">–</span>'}</td>
+      <td class="${statusCls}">${statusTxt}${r.note ? `<div class="p-note">${escapeHtml(r.note)}</div>` : ''}</td>
+    </tr>`;
+  }).join('');
+  $('tableWrap').innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
+    <div class="hint">All times in seconds. Click a column heading to sort.</div>`;
+  $('tableWrap').querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
+    const k = th.dataset.key;
+    state.sort = { key: k, dir: state.sort.key === k ? -state.sort.dir : (COLS.find(c => c.key === k).num && k !== 'order' ? -1 : 1) };
+    renderTable(state.last ? state.last.rows : []);
+  }));
+}
+
+function render(s){
+  state.last = s;
+  const running = ['starting', 'running', 'signin'].includes(s.state);
+  $('statusCard').hidden = s.state === 'idle';
+  $('resultsCard').hidden = !(s.rows && s.rows.length) && !running;
+  const total = (s.progress && s.progress.total) || 0, done = (s.progress && s.progress.done) || 0;
+  $('bar').style.width = total ? `${Math.round(done / total * 100)}%` : (running ? '4%' : '100%');
+  const icon = running ? '<span class="p-spin"></span>' : (s.state === 'done' ? '✔' : s.state === 'error' ? '✖' : '■');
+  $('statusLine').innerHTML = `${icon}<span>${escapeHtml(s.message || '')}${total ? ` <span class="muted">(${done}/${total} loads)</span>` : ''}</span>`;
+  $('statusBanner').innerHTML =
+    s.state === 'signin' ? '<div class="p-banner warn">Switch to the Edge window and sign in to Power BI. The test carries on by itself once you\'re in.</div>'
+    : s.state === 'error' ? `<div class="p-banner bad">${escapeHtml(s.error || s.message)}</div>`
+    : (s.csv_path ? `<div class="p-banner info">Saved: ${escapeHtml(s.csv_path)}</div>` : '');
+  $('sourceHint').textContent = s.pages_source ? `Pages from: ${s.pages_source}` : '';
+  $('openBtn').hidden = !s.csv_path;
+  $('exportBtn').disabled = !(s.rows && s.rows.some(r => r.runs_done > 0)) || running;
+  $('startBtn').disabled = running || !urlOk();
+  $('stopBtn').hidden = !running;
+  ['url', 'runs', 'browseBtn', 'clearBtn'].forEach(id => $(id).disabled = running);
+  renderTable(s.rows);
+  document.getElementById('perfRunDot').hidden = !running;
+  if(!running && state.polling){ clearInterval(state.polling); state.polling = null; }
+}
+
+let urlValid = false;
+const urlOk = () => urlValid;
+async function checkUrl(){
+  const v = $('url').value.trim();
+  if(!v){ urlValid = false; $('urlErr').hidden = true; $('url').classList.remove('invalid'); }
+  else {
+    const r = await window.pywebview.api.perf_validate_url(v);
+    urlValid = r.ok;
+    $('url').classList.toggle('invalid', !r.ok);
+    $('urlErr').hidden = r.ok;
+    $('urlErr').textContent = r.ok ? '' : r.error;
+  }
+  $('startBtn').disabled = !urlValid || (state.last && ['starting','running','signin'].includes(state.last.state));
+}
+
+async function poll(){
+  try { render(await window.pywebview.api.perf_status()); } catch(e) { /* window closing */ }
+}
+
+window.addEventListener('pywebviewready', async () => {
+  const env = await window.pywebview.api.perf_environment();
+  if(!env.edge_found) $('envBanner').innerHTML = '<div class="p-banner bad">Microsoft Edge wasn\'t found on this PC - it\'s needed to open the report.</div>';
+  $('url').addEventListener('input', checkUrl);
+  $('browseBtn').addEventListener('click', async () => {
+    const p = await window.pywebview.api.browse_folder();
+    if(p){ state.pbip = p; $('pbipBox').textContent = p; $('pbipBox').classList.add('has-path'); $('clearBtn').hidden = false; }
+  });
+  $('clearBtn').addEventListener('click', () => {
+    state.pbip = null; $('pbipBox').textContent = 'Not set - pages are read from the report itself.';
+    $('pbipBox').classList.remove('has-path'); $('clearBtn').hidden = true;
+  });
+  $('startBtn').addEventListener('click', async () => {
+    const runs = Math.max(1, Math.min(10, parseInt($('runs').value, 10) || 3));
+    $('runs').value = runs; state.runs = runs;
+    const r = await window.pywebview.api.perf_start($('url').value.trim(), runs, state.pbip);
+    if(!r.ok){ $('urlErr').hidden = false; $('urlErr').textContent = r.error; return; }
+    state.sort = { key: 'order', dir: 1 };
+    poll(); state.polling = setInterval(poll, 1000);
+  });
+  $('stopBtn').addEventListener('click', () => window.pywebview.api.perf_stop());
+  $('exportBtn').addEventListener('click', async () => {
+    const p = await window.pywebview.api.perf_export_csv();
+    if(p){ $('statusBanner').innerHTML = `<div class="p-banner info">Exported: ${escapeHtml(p)}</div>`; }
+  });
+  $('openBtn').addEventListener('click', () => state.last && state.last.csv_path && window.pywebview.api.perf_open_path(state.last.csv_path));
+});
+
+// ---- top-level tabs ----
+const SUBS = {
+  scan: document.getElementById('appSub').innerHTML,
+  perf: 'Measure how fast each page of a published Power BI report responds in the service.',
+};
+function showTab(which){
+  document.getElementById('scanView').hidden = which !== 'scan';
+  document.getElementById('perfView').hidden = which !== 'perf';
+  document.getElementById('tabScan').classList.toggle('active', which === 'scan');
+  document.getElementById('tabPerf').classList.toggle('active', which === 'perf');
+  document.getElementById('appSub').innerHTML = SUBS[which];
+}
+document.getElementById('tabScan').addEventListener('click', () => showTab('scan'));
+document.getElementById('tabPerf').addEventListener('click', () => showTab('perf'));
+})();
+</script>
+</body>
+</html>

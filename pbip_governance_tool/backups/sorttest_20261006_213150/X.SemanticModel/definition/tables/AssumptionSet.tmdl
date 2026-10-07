@@ -1,0 +1,72 @@
+table AssumptionSet
+	lineageTag: ca9b4175-73ff-4790-b81b-11ee05e064fd
+
+	column 'Plan design parameters'
+		dataType: string
+		lineageTag: ed920813-b553-4420-9103-843b6f32de01
+		summarizeBy: none
+		sourceColumn: Plan design parameters
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Display name'
+		dataType: string
+		lineageTag: 53a94455-538f-42bb-bbba-1e2b54653cc0
+		summarizeBy: none
+		sourceColumn: Display name
+		sortByColumn: Sort
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Enabled
+		dataType: string
+		lineageTag: 7a9a0f2d-1509-43b1-880e-46de820f600a
+		summarizeBy: none
+		sourceColumn: Enabled
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 803cca1b-1a5a-40a0-8c47-0f195fc8ad11
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 7096d8e0-de8b-4290-8259-e77457b0f3f8
+		summarizeBy: sum
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition AssumptionSet = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(Web.Contents(SourceFile), null, true),
+				    #"Filtered Rows" = Table.SelectRows(Source, each ([Name] = "Parameters")),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Filtered Rows",{"Data"}),
+				    #"Expanded Data" = Table.ExpandTableColumn(#"Removed Other Columns", "Data", {"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9"}, {"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9"}),
+				    #"Removed Top Rows" = Table.Skip(#"Expanded Data",18),
+				    #"Removed Other Columns1" = Table.SelectColumns(#"Removed Top Rows",{"Column2", "Column3", "Column4", "Column6"}),
+				    #"Kept First Rows" = Table.FirstN(#"Removed Other Columns1",3),
+				    #"Renamed Columns" = Table.RenameColumns(#"Kept First Rows",{{"Column6", "Description"}, {"Column4", "Enabled"}, {"Column2", "Plan design parameters"}, {"Column3", "Display name"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Plan design parameters", type text}, {"Display name", type text}, {"Enabled", type text}}),
+				    #"Added Index" = Table.AddIndexColumn(#"Changed Type", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Added Index",{{"Index", "Sort"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Description", type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type1",{{"Display name", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Display name", Text.Clean, type text}})
+				in
+				    #"Cleaned Text"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

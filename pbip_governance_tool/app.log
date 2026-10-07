@@ -1,0 +1,49 @@
+[01:56:10] ============================================================
+[01:56:10] Starting PBIP Governance Assistant...
+[01:56:10] Python: 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]
+[01:56:10] Executable: C:\Python313\python.exe
+[01:56:11] UI file: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\BI_HELPER\pbip_governance_tool\ui\index.html (exists=True)
+[01:56:11] Window object created.
+[01:56:11] Starting GUI loop (backend: edgechromium)...
+[01:56:31] Scanning: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\DEMO QA TEST
+[01:56:31] Scan done: 1000 visuals, 156 findings
+[01:57:25] Fix applied: 156 ok, 0 failed, backup=C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\DEMO QA TEST\_pbip_governance_backups\20260918_015725
+[11:24:20] GUI loop ended (window was closed normally).
+[11:24:39] ============================================================
+[11:24:39] Starting PBIP Governance Assistant...
+[11:24:39] Python: 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]
+[11:24:39] Executable: C:\Python313\python.exe
+[11:24:39] UI file: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\BI_HELPER\pbip_governance_tool\ui\index.html (exists=True)
+[11:24:39] Window object created.
+[11:24:39] Starting GUI loop (backend: edgechromium)...
+[11:24:55] Scanning: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\DEMO QA TEST
+[11:25:08] Scan done: 1000 visuals, 131 findings
+[11:26:25] Fix applied: 131 ok, 0 failed, backup=C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\DEMO QA TEST\_pbip_governance_backups\20260918_112625
+[11:34:38] GUI loop ended (window was closed normally).
+[11:37:53] ============================================================
+[11:37:53] Starting PBIP Governance Assistant...
+[11:37:53] Python: 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]
+[11:37:53] Executable: C:\Python313\python.exe
+[11:37:53] UI file: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\BI_HELPER\pbip_governance_tool\ui\index.html (exists=True)
+[11:37:53] Window object created.
+[11:37:53] Starting GUI loop (backend: edgechromium)...
+[11:38:08] Scanning: C:\Users\JEROM4079\OneDrive - Willis Towers Watson\Desktop\TESTS\DEMO QA TEST
+[11:38:09] Scan done: 1000 visuals, 131 findings
+[11:51:54] Scanning: C:\dev\claude_cowork_test_pbip
+[11:51:54] Scan done: 0 visuals, 0 findings
+[11:53:15] Scanning: C:\dev\claude_cowork_test_pbip
+[11:53:16] Scan done: 1000 visuals, 427 findings
+[11:53:23] Fix applied: 427 ok, 0 failed, backup=C:\dev\claude_cowork_test_pbip\_pbip_governance_backups\20260918_115322
+[11:53:23] Scanning: C:\dev\claude_cowork_test_pbip
+[11:53:29] Scan done: 1000 visuals, 131 findings
+[11:55:05] GUI loop ended (window was closed normally).
+[01:30:11] ============================================================
+[01:30:11] Starting BI Dev Assistant...
+[01:30:11] Python: 3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]
+[01:30:11] Executable: /usr/bin/python3
+[01:30:12] Performance test: https://app.powerbi.com/groups/x/reports/y/aaaaaaaaaaaaaaaaaaaa?experience=power-bi (runs=1, pbip=-)
+[01:30:15] Page discovery: 1 JSON response(s) to inspect
+[01:30:15]   https://wabi-west-europe-redirect.analysis.windows.net/explore/reports/R1/modelsAndExploration?preferReadOnlySession=true -> 4 page(s)
+[01:30:15] Pages (4) from Power BI service (report metadata)
+[01:30:40] Scanning: /tmp/apitest/Mini (rules: all)
+[01:30:40] Scan done: 59 visuals, 5 findings
